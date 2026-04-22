@@ -29,14 +29,14 @@ class Dictionary:
 
     def __getitem__(self, key: Any) -> Any:
         index = self._find_slot(key)
-        if self.slots[index] is None:
-            raise KeyError
+        if self.slots[index] is None or self.slots[index] is _DELETED:
+            raise KeyError(f"Key not found: {key}")
         return self.slots[index].value
 
     def __len__(self) -> int:
         return self.length
 
-    def _find_slot(self, key: Any) -> Any:
+    def _find_slot(self, key: Any) -> int:
         key_hash = hash(key)
         index = key_hash % len(self.slots)
         first_deleted_idx = None
@@ -71,8 +71,8 @@ class Dictionary:
 
     def __delitem__(self, key: Any) -> None:
         index = self._find_slot(key)
-        if self.slots[index] is None:
-            raise KeyError(key)
+        if self.slots[index] is None or self.slots[index] is _DELETED:
+            raise KeyError(f"Key not found: {key}")
 
         self.slots[index] = _DELETED
         self.length -= 1
